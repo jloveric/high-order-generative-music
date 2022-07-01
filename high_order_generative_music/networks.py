@@ -1,27 +1,17 @@
 from typing import List
 from torch import Tensor
-import os
-from omegaconf import DictConfig, OmegaConf
-import hydra
+from omegaconf import DictConfig
 from torchmetrics.functional import accuracy
 from high_order_layers_torch.layers import *
 from high_order_layers_torch.networks import *
-from pytorch_lightning import LightningModule, Trainer
+from pytorch_lightning import LightningModule
 import torch.optim as optim
 import torch.nn.functional as F
 import torch.nn as nn
-import numpy as np
-import matplotlib.pyplot as plt
 import torch
-from pytorch_lightning.callbacks import EarlyStopping, LearningRateMonitor
-from high_order_implicit_representation.random_sample_dataset import (
-    RandomImageSampleDataModule,
-)
+
 import torch_optimizer as alt_optim
 
-# from high_order_mlp import HighOrderMLP
-from high_order_implicit_representation.single_image_dataset import image_to_dataset
-from torch.utils.data import DataLoader, Dataset
 import logging
 
 logging.basicConfig()
