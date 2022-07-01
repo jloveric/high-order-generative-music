@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import torch
 
 
-def plot_waveform(waveform, sample_rate):
+def plot_waveform(waveform, sample_rate, window=None):
     waveform = waveform.numpy()
 
     num_channels, num_frames = waveform.shape
@@ -12,12 +12,12 @@ def plot_waveform(waveform, sample_rate):
     if num_channels == 1:
         axes = [axes]
     for c in range(num_channels):
-        axes[c].plot(time_axis, waveform[c], linewidth=1)
+        axes[c].plot(time_axis[window], waveform[c][window], linewidth=1)
         axes[c].grid(True)
         if num_channels > 1:
             axes[c].set_ylabel(f"Channel {c+1}")
     figure.suptitle("waveform")
-    plt.show(block=False)
+    plt.show()
 
 
 def plot_specgram(waveform, sample_rate, title="Spectrogram"):
