@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 def single_recording_dataset(filename: str):
     with open(filename, "rb") as file:
-        metadata = torchaudio.info(filename)
         waveform, sample_rate = torchaudio.load(file)
         return waveform, sample_rate
 
