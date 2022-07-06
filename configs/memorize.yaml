@@ -1,7 +1,7 @@
 filename: music/TeaKPea-vpunk.mp3
 n: 3
 conv:
-  layer_type: "continuous"
+  layer_type: "continuous1d"
   n: ${n}
   periodicity: 2.0
   kernel_size: [10, 10, 10, 10]
@@ -28,6 +28,9 @@ mlp:
     segments: 1
     layers: 2
     width: 10
+data:
+  window_size: 1000
+  output_window_size: 1
 
 max_epochs: 50
 gpus: 1

@@ -59,9 +59,13 @@ class Net(LightningModule):
         self.linear = torch.nn.LazyLinear(out_features=1)
 
         self.loss = nn.MSELoss()
-        self.model = nn.Sequential([self.conv, self.linear])
+        print("self.conv", self.conv)
+        print("self.linear", self.linear)
+
+        self.model = nn.Sequential(self.conv, self.linear)
 
     def forward(self, x):
+        print("x.shape", x.shape)
         return self.model(x)
 
     def eval_step(self, batch: Tensor, name: str):

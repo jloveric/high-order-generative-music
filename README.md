@@ -5,7 +5,20 @@ Experiments in generative music
 [Free music archive](https://freemusicarchive.org/) tool is located [here](https://github.com/mdeff/fma) and the 
 
 # Installation
-Make sure to install ffmpeg as it's used by torchaudio
+Make sure to install ffmpeg as it's used by torchaudio.  When running things on the command line
+```
+poetry install
+```
+and then
+```
+poetry shell
+```
+# Examples
+Try and memorize as set
+```
+python examples/memorize.py
+```
+
 
 # Relevant Papers
 [Goodbye Wavenet](https://syncedreview.com/2022/06/22/a-wavenet-rival-stanford-u-study-models-raw-audio-waveforms-over-contexts-of-500k-samples/)

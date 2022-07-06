@@ -397,7 +397,7 @@ tornado = ["tornado (>=0.2)"]
 
 [[package]]
 name = "high-order-layers-torch"
-version = "1.1.11"
+version = "1.1.13"
 description = "High order layers in pytorch"
 category = "main"
 optional = false
@@ -1634,8 +1634,8 @@ gunicorn = [
     {file = "gunicorn-20.1.0.tar.gz", hash = "sha256:e0a968b5ba15f8a328fdfd7ab1fcb5af4470c28aaf7e55df02a99bc13138e6e8"},
 ]
 high-order-layers-torch = [
-    {file = "high-order-layers-torch-1.1.11.tar.gz", hash = "sha256:d968f18cb5463c7ecf6b53894c5ebb1eebf537d3e1128ad8940b54fbbaa8ee39"},
-    {file = "high_order_layers_torch-1.1.11-py3-none-any.whl", hash = "sha256:424fc1d34906852bada4a576239b0302a3b27a6bd7c473bc29014d25246c111a"},
+    {file = "high-order-layers-torch-1.1.13.tar.gz", hash = "sha256:0f2fc55551eb781865ba56e7baf13ef041cbdd25f05093cb001bdbe46b2814b3"},
+    {file = "high_order_layers_torch-1.1.13-py3-none-any.whl", hash = "sha256:1fcf8a0af638318b300668ff33acc8b0335f03379f0fbf8d458bcac2c6c8c521"},
 ]
 hydra-core = [
     {file = "hydra-core-1.2.0.tar.gz", hash = "sha256:4990721ce4ac69abafaffee566d6b63a54faa6501ecce65b338d3251446ff634"},
