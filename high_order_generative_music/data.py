@@ -1,11 +1,16 @@
 import torchaudio
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 from torch import Tensor
+import pytorch_lightning as pl
+from typing import Optional
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def single_recording_dataset(filename: str):
     with open(filename, "rb") as file:
-
         metadata = torchaudio.info(filename)
         waveform, sample_rate = torchaudio.load(file)
         return waveform, sample_rate
@@ -15,7 +20,7 @@ class SingleRecordingDataset(Dataset):
     def __init__(
         self,
         waveform: Tensor,
-        sample_rate,
+        sample_rate: float,
         window_size: int = 1000,
         channel: int = 0,
         output_window_size: int = 1,
@@ -35,4 +40,94 @@ class SingleRecordingDataset(Dataset):
         return (
             self._waveform[idx:offset],
             self._waveform[offset : (offset + self._output_window_size)],
+        )
+
+
+class SingleRecordingDataModule(pl.LightningDataModule):
+    def __init__(
+        self,
+        filename: str,
+        window_size: int,
+        output_window_size: int,
+        batch_size: int = 32,
+        num_workers: int = 10,
+        dataset: Dataset = SingleRecordingDataset,
+        channel: int = 0,
+    ):
+        super().__init__()
+        self._filename = filename
+        self._window_size = window_size
+        self._output_window_size = output_window_size
+        self._batch_size = batch_size
+        self._num_workers = num_workers
+        self._dataset = dataset
+        self._channel = channel
+
+    def setup(self, stage: Optional[str] = None):
+
+        waveform, sample_rate = single_recording_dataset(filename=self._filename)
+
+        self._train_dataset = self._dataset(
+            waveform=waveform,
+            sample_rate=sample_rate,
+            window_size=self._window_size,
+            output_window_size=self._output_window_size,
+            channel=self._channel,
+        )
+        self._val_dataset = self._dataset(
+            waveform=waveform,
+            sample_rate=sample_rate,
+            window_size=self._window_size,
+            output_window_size=self._output_window_size,
+            channel=self._channel,
+        )
+        self._test_dataset = self._dataset(
+            waveform=waveform,
+            sample_rate=sample_rate,
+            window_size=self._window_size,
+            output_window_size=self._output_window_size,
+            channel=self._channel,
+        )
+
+        logger.info(f"Train dataset size is {len(self._train_dataset)}")
+        logger.info(f"Validation dataset size is {len(self._val_dataset)}")
+        logger.info(f"Test dataset size is {len(self._test_dataset)}")
+
+    @property
+    def train_dataset(self):
+        return self._train_dataset
+
+    @property
+    def test_dataset(self):
+        return self._test_dataset
+
+    @property
+    def val_dataset(self):
+        return self._val_dataset
+
+    def train_dataloader(self):
+        return DataLoader(
+            self._train_dataset,
+            batch_size=self._batch_size,
+            shuffle=True,
+            pin_memory=True,
+            num_workers=self._num_workers,
+        )
+
+    def val_dataloader(self):
+        return DataLoader(
+            self._val_dataset,
+            batch_size=self._batch_size,
+            shuffle=False,
+            pin_memory=True,
+            num_workers=self._num_workers,
+        )
+
+    def test_dataloader(self):
+        return DataLoader(
+            self._test_dataset,
+            batch_size=self._batch_size,
+            shuffle=False,
+            pin_memory=True,
+            num_workers=self._num_workers,
         )
