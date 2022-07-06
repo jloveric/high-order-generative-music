@@ -1,3 +1,4 @@
+[![CI](https://github.com/jloveric/high-order-generative-music/actions/workflows/python-app.yml/badge.svg)](https://github.com/jloveric/high-order-generative-music/actions/workflows/python-app.yml)
 # high-order-generative-music
 Experiments in generative music
 
