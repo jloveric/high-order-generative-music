@@ -3,7 +3,10 @@ from torch import Tensor
 from omegaconf import DictConfig
 from torchmetrics.functional import accuracy
 from high_order_layers_torch.layers import *
-from high_order_layers_torch.networks import *
+from high_order_layers_torch.networks import (
+    HighOrderFullyConvolutionalNetwork,
+    HighOrderMLP,
+)
 from pytorch_lightning import LightningModule
 import torch.optim as optim
 import torch.nn.functional as F
@@ -24,7 +27,20 @@ class Net(LightningModule):
         super().__init__()
         self.save_hyperparameters(cfg)
         self.cfg = cfg
-        self.model = HighOrderMLP(
+        self.conv = HighOrderFullyConvolutionalNetwork(
+            layer_type=cfg.conv.layer_type,
+            n=cfg.conv.n,
+            channels=cfg.conv.channels,
+            segments=cfg.conv.segments,
+            kernel_size=cfg.conv.kernel_size,
+            rescale_output=False,
+            periodicity=cfg.conv.periodicity,
+            normalization=torch.nn.LazyBatchNorm1d,
+            stride=cfg.conv.stride,
+            pooling=None,  # don't add an average pooling layer
+        )
+        """
+        self.mlp = HighOrderMLP(
             layer_type=cfg.mlp.layer_type,
             n=cfg.mlp.n,
             n_in=cfg.mlp.n_in,
@@ -39,7 +55,11 @@ class Net(LightningModule):
             hidden_segments=cfg.mlp.hidden.segments,
             normalization=torch.nn.LazyBatchNorm1d,
         )
+        """
+        self.linear = torch.nn.LazyLinear(out_features=1)
+
         self.loss = nn.MSELoss()
+        self.model = nn.Sequential([self.conv, self.linear])
 
     def forward(self, x):
         return self.model(x)

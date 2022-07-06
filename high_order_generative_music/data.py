@@ -17,19 +17,20 @@ def single_recording_dataset(filename: str):
 
 
 class SingleRecordingDataset(Dataset):
-    def __init__(self, waveform: Tensor, sample_rate):
-        self._waveform = waveform
-        self._
+    def __init__(
+        self, waveform: Tensor, sample_rate, window_size: int = 1000, channel: int = 0
+    ):
+        self._waveform = waveform[channel]
+        self._sample_rate = sample_rate
+        self._window_size = window_size
+        self._size = self._waveform.shape[0] - (window_size + 1)
 
     def __len__(self):
-        return len(self.img_labels)
+        return self._size
 
     def __getitem__(self, idx):
-        img_path = os.path.join(self.img_dir, self.img_labels.iloc[idx, 0])
-        image = read_image(img_path)
-        label = self.img_labels.iloc[idx, 1]
-        if self.transform:
-            image = self.transform(image)
-        if self.target_transform:
-            label = self.target_transform(label)
-        return image, label
+
+        return (
+            self._waveform[idx : (idx + self._window_size)],
+            self._waveform[idx : (idx + self._window_size + 1)],
+        )

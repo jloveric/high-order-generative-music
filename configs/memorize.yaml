@@ -1,7 +1,17 @@
 filename: music/TeaKPea-vpunk.mp3
+n: 3
+conv:
+  layer_type: "continuous"
+  n: ${n}
+  periodicity: 2.0
+  kernel_size: [10, 10, 10, 10]
+  stride: [10, 10, 10, 10]
+  channels: [1, 2, 4, 16]
+  segments: 2
+
 mlp:
   layer_type: "polynomial"
-  n: 3
+  n: ${n}
   n_in: null
   n_out: null
   n_hidden: null
