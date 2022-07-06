@@ -20,4 +20,7 @@ def test_single_recording_dataset():
 
     features, targets = dataiter.next()
 
+    assert features.shape[0] == targets.shape[0]
+    assert features.shape[1] == 100
+    assert targets.shape[1] == 1
     print("features", features, "targets", targets)
