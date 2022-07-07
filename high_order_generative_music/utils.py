@@ -14,7 +14,13 @@ from torchvision import transforms
 logger = logging.getLogger(__name__)
 
 
-def generate_audio(model: nn.Module, features: int, samples: int, output_size: int):
+def generate_audio(
+    model: nn.Module,
+    features: int,
+    samples: int,
+    output_size: int,
+    noiseless: bool = True,
+):
 
     model.eval()
     with torch.no_grad():
@@ -26,7 +32,7 @@ def generate_audio(model: nn.Module, features: int, samples: int, output_size: i
             output = output.unsqueeze(1)
             values = torch.cat([values, output], dim=2)
 
-        return values
+        return values[:, :, features:]
 
 
 class AudioGenerationSampler(Callback):
@@ -102,6 +108,7 @@ class WaveformImageSampler(Callback):
                 facecolor="auto",
                 edgecolor="auto",
                 backend=None,
+                transparent=False,
             )
             buf.seek(0)
             image = PIL.Image.open(buf)
