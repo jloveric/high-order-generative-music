@@ -74,7 +74,7 @@ def memorize(cfg: DictConfig):
 
         trainer.test(model, datamodule=datamodule)
         logger.info("finished testing")
-        logger.info("best check_point", trainer.checkpoint_callback.best_model_path)
+        logger.info(f"best check_point {trainer.checkpoint_callback.best_model_path}")
     else:
         # plot some data
         logger.info("evaluating result")
