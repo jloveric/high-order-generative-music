@@ -7,7 +7,10 @@ from high_order_generative_music.data import SingleRecordingDataModule
 from pytorch_lightning.callbacks import LearningRateMonitor
 from pytorch_lightning import Trainer
 from high_order_generative_music.networks import Net
-from high_order_generative_music.utils import AudioGenerationSampler
+from high_order_generative_music.utils import (
+    AudioGenerationSampler,
+    WaveformImageSampler,
+)
 import logging
 import os
 
@@ -43,12 +46,18 @@ def memorize(cfg: DictConfig):
             output_size=cfg.data.window_size,
             sample_rate=datamodule.sample_rate,
         )
+        waveform_generator = WaveformImageSampler(
+            features=cfg.data.window_size,
+            samples=2,
+            output_size=cfg.data.window_size,
+            sample_rate=datamodule.sample_rate,
+        )
 
         lr_monitor = LearningRateMonitor(logging_interval="epoch")
         trainer = Trainer(
             max_epochs=cfg.max_epochs,
             gpus=cfg.gpus,
-            callbacks=[lr_monitor, audio_generator],
+            callbacks=[lr_monitor, audio_generator, waveform_generator],
         )
         model = Net(cfg)
         trainer.fit(model, datamodule=datamodule)
