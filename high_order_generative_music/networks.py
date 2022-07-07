@@ -59,18 +59,15 @@ class Net(LightningModule):
         self.linear = torch.nn.LazyLinear(out_features=1)
 
         self.loss = nn.MSELoss()
-        print("self.conv", self.conv)
-        print("self.linear", self.linear)
 
         self.model = nn.Sequential(self.conv, self.linear)
 
     def forward(self, x):
-        print("x.shape", x.shape)
         return self.model(x)
 
     def eval_step(self, batch: Tensor, name: str):
         x, y = batch
-        y_hat = self(x.flatten(1))
+        y_hat = self(x)
         loss = self.loss(y_hat.flatten(), y.flatten())
 
         self.log(f"{name}_loss", loss, prog_bar=True)

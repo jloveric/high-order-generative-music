@@ -36,10 +36,9 @@ class SingleRecordingDataset(Dataset):
     def __getitem__(self, idx):
 
         offset = idx + self._window_size
-        return (
-            self._waveform[idx:offset],
-            self._waveform[offset : (offset + self._output_window_size)],
-        )
+        features = self._waveform[idx:offset].unsqueeze(0)
+        targets = self._waveform[offset : (offset + self._output_window_size)]
+        return features, targets
 
 
 class SingleRecordingDataModule(pl.LightningDataModule):
