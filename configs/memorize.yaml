@@ -29,13 +29,13 @@ mlp:
     layers: 2
     width: 10
 data:
-  window_size: 1000
+  window_size: 10000
   output_window_size: 1
 
 max_epochs: 50
 gpus: 1
 lr: 1e-3
-batch_size: 256
+batch_size: 512
 
 # Are you training? Otherwise plot the result
 train: True
