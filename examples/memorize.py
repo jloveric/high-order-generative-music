@@ -11,6 +11,8 @@ from high_order_generative_music.utils import (
     AudioGenerationSampler,
     WaveformImageSampler,
 )
+from high_order_generative_music.logger import MultiLogger
+
 import logging
 import os
 
@@ -22,7 +24,9 @@ logger = logging.getLogger(__name__)
 def memorize(cfg: DictConfig):
 
     base_dir = utils.get_original_cwd()
-    mlflow.set_tracking_uri(f"file://{base_dir}/mlruns")
+
+    mlflow_runs = f"file://{base_dir}/mlruns"
+    mlflow.set_tracking_uri(mlflow_runs)
 
     logger.info(OmegaConf.to_yaml(cfg))
     logger.info(f"Working directory {os.getcwd()}")
@@ -53,12 +57,17 @@ def memorize(cfg: DictConfig):
             sample_rate=datamodule.sample_rate,
         )
 
+        # Logging for both tensorboard and mlflow
+        multilogger = MultiLogger(mlflow_path=mlflow_runs)
+
         lr_monitor = LearningRateMonitor(logging_interval="epoch")
         trainer = Trainer(
             max_epochs=cfg.max_epochs,
             gpus=cfg.gpus,
+            logger=multilogger,
             callbacks=[lr_monitor, audio_generator, waveform_generator],
         )
+
         model = Net(cfg)
         trainer.fit(model, datamodule=datamodule)
         logger.info("testing")

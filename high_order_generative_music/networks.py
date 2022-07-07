@@ -39,23 +39,7 @@ class Net(LightningModule):
             stride=cfg.conv.stride,
             pooling=None,  # don't add an average pooling layer
         )
-        """
-        self.mlp = HighOrderMLP(
-            layer_type=cfg.mlp.layer_type,
-            n=cfg.mlp.n,
-            n_in=cfg.mlp.n_in,
-            n_hidden=cfg.mlp.n_in,
-            n_out=cfg.mlp.n_out,
-            in_width=cfg.mlp.input.width,
-            in_segments=cfg.mlp.input.segments,
-            out_width=cfg.mlp.output.width,
-            out_segments=cfg.mlp.output.segments,
-            hidden_width=cfg.mlp.hidden.width,
-            hidden_layers=cfg.mlp.hidden.layers,
-            hidden_segments=cfg.mlp.hidden.segments,
-            normalization=torch.nn.LazyBatchNorm1d,
-        )
-        """
+
         self.linear = torch.nn.LazyLinear(out_features=1)
 
         self.loss = nn.MSELoss()

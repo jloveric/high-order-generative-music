@@ -27,6 +27,11 @@ and for debugging
 ```
 python examples/memorize.py data.max_size=10000 data.window_size=1000
 ```
+run mlflow
+```
+poetry run mlflow ui
+```
+
 # Relevant Papers
 [Goodbye Wavenet](https://syncedreview.com/2022/06/22/a-wavenet-rival-stanford-u-study-models-raw-audio-waveforms-over-contexts-of-500k-samples/)
 
