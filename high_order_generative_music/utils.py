@@ -94,6 +94,7 @@ class WaveformImageSampler(Callback):
             )
 
             # audio has dimension [batch, 1, wave_length]
+            plt.clf()
             for e in range(self._samples):
                 plt.plot(audio[e, 0, :].cpu())
 
