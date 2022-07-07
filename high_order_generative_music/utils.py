@@ -11,13 +11,13 @@ def generate_audio(model: nn.Module, features: int, samples: int, output_size: i
 
     model.eval()
     features = features
-    sample_start = torch.rand(samples, 1, features, device=model.device) * 2 - 1
+    values = torch.rand(samples, 1, features, device=model.device) * 2 - 1
 
-    values = sample_start
     for i in range(output_size):
         model.eval()
         output = model(values[:, :, -features:])
-        values = torch.stack([values, output])
+        output = output.unsqueeze(1)
+        values = torch.cat([values, output], dim=2)
 
     return values
 
