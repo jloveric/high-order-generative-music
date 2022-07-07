@@ -22,7 +22,7 @@ def test_single_recording_dataset():
     features, targets = dataiter.next()
 
     assert features.shape[0] == targets.shape[0]
-    assert features.shape[1] == 100
+    assert features.shape[2] == 100
     assert targets.shape[1] == 1
 
 
@@ -45,6 +45,6 @@ def test_random_image_sample_datamodule():
 
     features, targets = iter(dataloader).next()
 
-    assert features.shape[1] == 1000
+    assert features.shape[2] == 1000
     assert targets.shape[1] == 1
     assert features.shape[0] == targets.shape[0]

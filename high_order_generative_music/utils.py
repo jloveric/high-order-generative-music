@@ -1,17 +1,8 @@
-from typing import List
-
 from high_order_layers_torch.layers import *
 from pytorch_lightning import Callback
 from high_order_layers_torch.networks import *
-from language_interpolation.single_text_dataset import (
-    encode_input_from_text,
-    decode_output_to_text,
-    ascii_to_float,
-)
 from torch import nn
-import random
 import logging
-from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +23,7 @@ def generate_audio(model: nn.Module, features: int, samples: int, output_size: i
 
 
 class AudioGenerationSampler(Callback):
-    def __init__(self, features, samples, output_size, sample_rate: int):
+    def __init__(self, features: int, samples: int, output_size: int, sample_rate: int):
         super().__init__()
         self._features = features
         self._samples = samples
