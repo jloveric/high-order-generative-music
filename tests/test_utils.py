@@ -1,14 +1,12 @@
 import pytest
-from high_order_generative_music.utils import generate_audio
+from high_order_generative_music.utils import generate_audio, AudioGenerationSampler
 from high_order_generative_music.networks import Net
 from omegaconf import DictConfig
 import torch
+from pytorch_lightning import Trainer
 
 
-def test_generate_audio():
-
-    features = 1000
-
+def make_config(features: int):
     cfg = DictConfig(
         {
             "filename": "music/TeaKPea-vpunk.mp3",
@@ -38,6 +36,14 @@ def test_generate_audio():
             "checkpoint": None,
         }
     )
+    return cfg
+
+
+def test_generate_audio():
+
+    features = 1000
+
+    cfg = make_config(features)
 
     model = Net(cfg)
 
@@ -49,3 +55,22 @@ def test_generate_audio():
     )
 
     assert result.shape == torch.Size([2, 1, 1100])
+
+
+def test_audio_generation_sampler():
+
+    features = 1000
+
+    cfg = make_config(features)
+
+    model = Net(cfg)
+    trainer = Trainer(
+        max_epochs=cfg.max_epochs,
+        gpus=cfg.gpus,
+    )
+
+    # Just make sure this runs
+    generator = AudioGenerationSampler(
+        features=1000, samples=2, output_size=100, sample_rate=2000
+    )
+    generator.on_train_epoch_end(trainer=trainer, pl_module=model)

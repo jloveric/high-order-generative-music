@@ -51,6 +51,7 @@ class SingleRecordingDataModule(pl.LightningDataModule):
         num_workers: int = 10,
         dataset: Dataset = SingleRecordingDataset,
         channel: int = 0,
+        max_size: int = None,
     ):
         super().__init__()
         self._filename = filename
@@ -60,36 +61,54 @@ class SingleRecordingDataModule(pl.LightningDataModule):
         self._num_workers = num_workers
         self._dataset = dataset
         self._channel = channel
+        self._sample_rate = None
+        self._max_size = max_size
+        self._initialized = False
+
+        # Currently doing this so sample_rate is computed immediately
+        self.setup()
 
     def setup(self, stage: Optional[str] = None):
 
-        waveform, sample_rate = single_recording_dataset(filename=self._filename)
+        if self._initialized is False:
+            # TODO: the sample rate should be set as input and then data should be
+            # subsampled.
+            waveform, self._sample_rate = single_recording_dataset(
+                filename=self._filename
+            )
+            if self._max_size is not None:
+                waveform = waveform[:, : self._max_size]
 
-        self._train_dataset = self._dataset(
-            waveform=waveform,
-            sample_rate=sample_rate,
-            window_size=self._window_size,
-            output_window_size=self._output_window_size,
-            channel=self._channel,
-        )
-        self._val_dataset = self._dataset(
-            waveform=waveform,
-            sample_rate=sample_rate,
-            window_size=self._window_size,
-            output_window_size=self._output_window_size,
-            channel=self._channel,
-        )
-        self._test_dataset = self._dataset(
-            waveform=waveform,
-            sample_rate=sample_rate,
-            window_size=self._window_size,
-            output_window_size=self._output_window_size,
-            channel=self._channel,
-        )
+            self._train_dataset = self._dataset(
+                waveform=waveform,
+                sample_rate=self._sample_rate,
+                window_size=self._window_size,
+                output_window_size=self._output_window_size,
+                channel=self._channel,
+            )
+            self._val_dataset = self._dataset(
+                waveform=waveform,
+                sample_rate=self._sample_rate,
+                window_size=self._window_size,
+                output_window_size=self._output_window_size,
+                channel=self._channel,
+            )
+            self._test_dataset = self._dataset(
+                waveform=waveform,
+                sample_rate=self._sample_rate,
+                window_size=self._window_size,
+                output_window_size=self._output_window_size,
+                channel=self._channel,
+            )
 
-        logger.info(f"Train dataset size is {len(self._train_dataset)}")
-        logger.info(f"Validation dataset size is {len(self._val_dataset)}")
-        logger.info(f"Test dataset size is {len(self._test_dataset)}")
+            logger.info(f"Train dataset size is {len(self._train_dataset)}")
+            logger.info(f"Validation dataset size is {len(self._val_dataset)}")
+            logger.info(f"Test dataset size is {len(self._test_dataset)}")
+            self._initialized = True
+
+    @property
+    def sample_rate(self):
+        return self._sample_rate
 
     @property
     def train_dataset(self):

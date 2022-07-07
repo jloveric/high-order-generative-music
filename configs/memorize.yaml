@@ -12,6 +12,7 @@ conv:
 data:
   window_size: 10000
   output_window_size: 1
+  max_size: null # Set the maimum number of records to use, null means use all.
 
 max_epochs: 50
 gpus: 1

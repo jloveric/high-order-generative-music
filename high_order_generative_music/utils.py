@@ -23,11 +23,16 @@ def generate_audio(model: nn.Module, features: int, samples: int, output_size: i
 
 
 class AudioGenerationSampler(Callback):
-    def __init__(self, features: int, samples: int, output_size: int, sample_rate: int):
+    def __init__(
+        self, features: int, samples: int, output_size: int, sample_rate: int = 0
+    ):
         super().__init__()
         self._features = features
         self._samples = samples
         self._output_size = output_size
+
+        if sample_rate is None or sample_rate <= 0:
+            raise ValueError(f"Sample rate must be positive, got {sample_rate}")
         self._sample_rate = sample_rate
 
     def on_train_epoch_end(self, trainer, pl_module, outputs=None):
@@ -39,9 +44,10 @@ class AudioGenerationSampler(Callback):
             output_size=self._output_size,
         )
 
-        trainer.logger.experiment.add_audio(
-            f"audio",
-            audio,
-            sample_rate=self._sample_rate,
-            global_step=trainer.global_step,
-        )
+        for i in range(self._samples):
+            trainer.logger.experiment.add_audio(
+                f"audio_{i}",
+                audio[i].flatten(),
+                sample_rate=self._sample_rate,
+                global_step=trainer.global_step,
+            )
