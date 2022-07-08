@@ -29,7 +29,7 @@ def make_config(features: int):
             },
             "data": {"window_size": features, "output_window_size": 1},
             "max_epochs": 50,
-            "gpus": 1,
+            "gpus": 0,
             "lr": 0.001,
             "batch_size": 512,
             "train": True,
@@ -54,7 +54,7 @@ def test_generate_audio():
         model=model, features=features, samples=samples, output_size=output_size
     )
 
-    assert result.shape == torch.Size([2, 1, 1100])
+    assert result.shape == torch.Size([2, 1, 100])
 
 
 def test_audio_generation_sampler():
