@@ -10,14 +10,14 @@ conv:
   segments: 2
 
 data:
-  window_size: 10000
+  window_size: 100000
   output_window_size: 1
   max_size: null # Set the maimum number of records to use, null means use all.
 
 max_epochs: 50
 gpus: 1
 lr: 1e-3
-batch_size: 512
+batch_size: 256
 
 # Are you training? Otherwise plot the result
 train: True
