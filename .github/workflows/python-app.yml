@@ -21,12 +21,13 @@ jobs:
         id: setup-ffmpeg
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Run ffmpeg
-        run: ffmpeg -h
+
       - name: Run image
         uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
+      - name: Run ffmpeg
+        run: ffmpeg -h
       - name: View poetry --help
         run: poetry install
       - name: tests
