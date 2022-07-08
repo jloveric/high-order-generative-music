@@ -3,15 +3,28 @@ from torch.utils.data import Dataset, DataLoader
 from torch import Tensor
 import pytorch_lightning as pl
 from typing import Optional
-
+import torchaudio.functional as F
+import torchaudio.transforms as T
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-def single_recording_dataset(filename: str):
+def single_recording_dataset(
+    filename: str, resample_rate: int = 11025, low_pass_filter_width: int = 6
+):
     with open(filename, "rb") as file:
         waveform, sample_rate = torchaudio.load(file)
+        logger.info(f"sample rate {sample_rate}")
+        if resample_rate is not None:
+            waveform = F.resample(
+                waveform=waveform,
+                orig_freq=sample_rate,
+                new_freq=resample_rate,
+                lowpass_filter_width=low_pass_filter_width,
+            )
+            return waveform, resample_rate
+
         return waveform, sample_rate
 
 
