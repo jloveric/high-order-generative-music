@@ -1,16 +1,7 @@
 filename: music/TeaKPea-vpunk.mp3
-n: 3
-conv:
-  layer_type: "continuous1d"
-  n: ${n}
-  periodicity: 2.0
-  kernel_size: [10, 10, 10, 10]
-  stride: [10, 10, 10, 10]
-  channels: [1, 2, 4, 16]
-  segments: 2
 
 data:
-  window_size: 100000
+  window_size: 10000
   output_window_size: 1
   max_size: null # Set the maimum number of records to use, null means use all.
 
@@ -25,3 +16,4 @@ checkpoint: null
 
 defaults:
   - optimizer: adam
+  - net: conv

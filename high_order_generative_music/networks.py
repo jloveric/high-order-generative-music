@@ -6,6 +6,8 @@ from high_order_layers_torch.layers import *
 from high_order_layers_torch.networks import (
     HighOrderFullyConvolutionalNetwork,
     HighOrderMLP,
+    LowOrderMLP,
+    HighOrderTailFocusNetwork,
 )
 from pytorch_lightning import LightningModule
 import torch.optim as optim
@@ -27,24 +29,10 @@ class Net(LightningModule):
         super().__init__()
         self.save_hyperparameters(cfg)
         self.cfg = cfg
-        self.conv = HighOrderFullyConvolutionalNetwork(
-            layer_type=cfg.conv.layer_type,
-            n=cfg.conv.n,
-            channels=cfg.conv.channels,
-            segments=cfg.conv.segments,
-            kernel_size=cfg.conv.kernel_size,
-            rescale_output=False,
-            periodicity=cfg.conv.periodicity,
-            normalization=torch.nn.LazyBatchNorm1d,
-            stride=cfg.conv.stride,
-            pooling=None,  # don't add an average pooling layer
-        )
 
-        self.linear = torch.nn.LazyLinear(out_features=1)
+        self.model = select_network(cfg)
 
         self.loss = nn.MSELoss()
-
-        self.model = nn.Sequential(self.conv, self.linear)
 
     def forward(self, x):
         return self.model(x)
@@ -109,3 +97,104 @@ class Net(LightningModule):
             return [optimizer], [scheduler]
         else:
             raise ValueError(f"Optimizer {self.cfg.optimizer.name} not recognized")
+
+
+# TODO: this is copied from the language-interpolation repo, so at some point
+# maybe we need to move something like this into high-order-layers-torch for
+# generic sequence learning.
+def select_network(cfg: DictConfig, device: str = None):
+    normalization = None
+    if cfg.net.normalize is True:
+        normalization = torch.nn.LazyBatchNorm1d
+
+    if cfg.net.model_type == "high_order_input":
+        """
+        Only the input layer is high order, the rest
+        of the layers are standard linear+relu and normalization.
+        """
+        layer_list = []
+        input_layer = high_order_fc_layers(
+            layer_type=cfg.net.layer_type,
+            n=cfg.net.n,
+            in_features=cfg.net.input.width,
+            out_features=cfg.net.hidden.width,
+            segments=cfg.net.input.segments,
+        )
+        layer_list.append(input_layer)
+
+        if normalization is not None:
+            layer_list.append(normalization())
+
+        lower_layers = LowOrderMLP(
+            in_width=cfg.net.hidden.width,
+            out_width=cfg.output.width,
+            hidden_width=cfg.net.hidden.width,
+            hidden_layers=cfg.net.hidden.layers - 1,
+            non_linearity=torch.nn.ReLU(),
+            normalization=normalization,
+        )
+        layer_list.append(lower_layers)
+
+        model = nn.Sequential(*layer_list)
+
+    elif cfg.net.model_type == "high_order":
+        """
+        Uniform high order model. All layers are high order.
+        """
+        model = HighOrderMLP(
+            layer_type=cfg.net.layer_type,
+            n=cfg.net.n,
+            n_in=cfg.net.n_in,
+            n_hidden=cfg.net.n_in,
+            n_out=cfg.net.n_out,
+            in_width=cfg.net.input.width,
+            in_segments=cfg.net.input.segments,
+            out_width=cfg.net.output.width,
+            out_segments=cfg.net.output.segments,
+            hidden_width=cfg.net.hidden.width,
+            hidden_layers=cfg.net.hidden.layers,
+            hidden_segments=cfg.net.hidden.segments,
+            normalization=normalization,
+        )
+    elif cfg.net.model_type == "high_order_conv":
+        conv = HighOrderFullyConvolutionalNetwork(
+            layer_type=cfg.net.layer_type,
+            n=cfg.net.n,
+            channels=cfg.net.channels,
+            segments=cfg.net.segments,
+            kernel_size=cfg.net.kernel_size,
+            rescale_output=False,
+            periodicity=cfg.net.periodicity,
+            normalization=torch.nn.LazyBatchNorm1d,
+            stride=cfg.net.stride,
+            pooling=None,  # don't add an average pooling layer
+        )
+
+        linear = torch.nn.LazyLinear(out_features=cfg.net.out_features)
+        model = nn.Sequential(conv, linear)
+    elif cfg.net.model_type == "high_order_tail_focus":
+        tail_focus = HighOrderTailFocusNetwork(
+            layer_type=cfg.net.layer_type,
+            n=cfg.net.n,
+            channels=cfg.net.channels,
+            segments=cfg.net.segments,
+            kernel_size=cfg.net.kernel_size,
+            rescale_output=False,
+            periodicity=cfg.net.periodicity,
+            normalization=torch.nn.LazyBatchNorm1d,
+            stride=cfg.net.stride,
+            focus=cfg.net.focus,
+        )
+
+        linear = torch.nn.LazyLinear(out_features=cfg.net.out_features)
+        model = nn.Sequential(tail_focus, linear)
+
+        widths, output_sizes = tail_focus.compute_sizes(cfg.net.features)
+        logger.info(f"TailFocusNetwork widths {widths} output_sizes {output_sizes}")
+
+    else:
+        raise ValueError(
+            f"Unrecognized model_type {cfg.model_type} should be high_order, high_order_input or high_order_conv!"
+        )
+
+    return model

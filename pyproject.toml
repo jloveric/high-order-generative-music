@@ -14,9 +14,9 @@ hydra-core = "^1.2.0"
 matplotlib = "^3.5.2"
 torch-optimizer = "^0.3.0"
 pytorch-lightning = "^1.6.4"
-high-order-layers-torch = "^1.1.14"
 Pillow = "^9.2.0"
 torchvision = "^0.13.0"
+high-order-layers-torch = "^1.1.16"
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"

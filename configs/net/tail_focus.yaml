@@ -1,0 +1,20 @@
+layer_type: "continuous1d"
+normalize: true
+rescale_output: False
+
+# Number of characters as input. Convnet can
+# have a much larger context
+features: 100000
+out_features: 1
+
+model_type: high_order_tail_focus
+
+n: 2
+periodicity: 2.0
+kernel_size: [16, 2, 16]
+stride: [8, 1, 8]
+channels: [1, 250, 250, 100]
+segments: [128, 2, 2]
+
+# Focus [0,16] 16 would take 16*channels
+focus: [0, 0, 16] # focus takes all of the final output
