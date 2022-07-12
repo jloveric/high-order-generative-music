@@ -15,9 +15,13 @@ and then
 poetry shell
 ```
 # Examples
-Try and memorize as set
+Try and memorize as set using conv net
 ```
 python examples/memorize.py
+```
+with a tail focus network
+```
+python examples/memorize.py data.max_size=100000 net=tail_focus  
 ```
 to try with shorter versions
 ```
