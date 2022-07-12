@@ -1,7 +1,7 @@
 filename: music/TeaKPea-vpunk.mp3
 
 data:
-  window_size: 10000
+  window_size: 100000
   output_window_size: 1
   max_size: null # Set the maimum number of records to use, null means use all.
 

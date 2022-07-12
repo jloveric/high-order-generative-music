@@ -144,6 +144,7 @@ class SingleRecordingDataModule(pl.LightningDataModule):
             num_workers=self._num_workers,
         )
 
+    """
     def val_dataloader(self):
         return DataLoader(
             self._val_dataset,
@@ -152,6 +153,7 @@ class SingleRecordingDataModule(pl.LightningDataModule):
             pin_memory=True,
             num_workers=self._num_workers,
         )
+    """
 
     def test_dataloader(self):
         return DataLoader(

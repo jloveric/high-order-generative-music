@@ -4,7 +4,7 @@ rescale_output: False
 
 # Number of characters as input. Convnet can
 # have a much larger context
-features: 1000000
+features: ${data.window_size}
 out_features: 1
 
 model_type: high_order_tail_focus
