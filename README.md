@@ -16,6 +16,8 @@ and then
 poetry shell
 ```
 # Examples
+Working on memorizing this musics [Tea K Pea - vpunk](https://freemusicarchive.org/search?adv=1&quicksearch=vpunk&&)
+
 Try and memorize as set using conv net
 ```
 python examples/memorize.py
