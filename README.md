@@ -40,6 +40,10 @@ and
 ```
 python examples/memorize.py net=tail_focus_small data.max_size=10000 data.window_size=1000
 ```
+write out an associated mp3
+```
+python examples/generate.py checkpoint=\"outputs/2022-07-14/07-14-52/lightning_logs/version_0/checkpoints/epoch=49-step=1800.ckpt\"
+```
 # Relevant Papers
 [Goodbye Wavenet](https://syncedreview.com/2022/06/22/a-wavenet-rival-stanford-u-study-models-raw-audio-waveforms-over-contexts-of-500k-samples/)
 
