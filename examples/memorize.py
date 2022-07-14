@@ -1,4 +1,4 @@
-import mlflow
+# import mlflow
 import hydra
 from hydra import utils
 from omegaconf import DictConfig, OmegaConf
@@ -26,8 +26,8 @@ def memorize(cfg: DictConfig):
 
     base_dir = utils.get_original_cwd()
 
-    mlflow_runs = f"file://{base_dir}/mlruns"
-    mlflow.set_tracking_uri(mlflow_runs)
+    # mlflow_runs = f"file://{base_dir}/mlruns"
+    # mlflow.set_tracking_uri(mlflow_runs)
 
     logger.info(OmegaConf.to_yaml(cfg))
     logger.info(f"Working directory {os.getcwd()}")
@@ -58,13 +58,13 @@ def memorize(cfg: DictConfig):
     )
 
     # Logging for both tensorboard and mlflow
-    multilogger = MultiLogger(mlflow_path=mlflow_runs)
+    # mlflow is not doing what I want...
+    # multilogger = MultiLogger(mlflow_path=mlflow_runs)
 
     lr_monitor = LearningRateMonitor(logging_interval="epoch")
     trainer = Trainer(
         max_epochs=cfg.max_epochs,
         gpus=cfg.gpus,
-        logger=multilogger,
         callbacks=[lr_monitor, audio_generator, waveform_generator],
     )
 

@@ -22,7 +22,10 @@ logger = logging.getLogger(__name__)
 
 
 @hydra.main(config_path="../configs", config_name="generate")
-def memorize(cfg: DictConfig):
+def generate(cfg: DictConfig):
+
+    if cfg.checkpoint is None:
+        raise ValueError(f"Must define cfg.checkpoint, got {cfg.checkpoint}")
 
     base_dir = utils.get_original_cwd()
 
