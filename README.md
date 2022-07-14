@@ -1,8 +1,10 @@
 [![CI](https://github.com/jloveric/high-order-generative-music/actions/workflows/python-app.yml/badge.svg)](https://github.com/jloveric/high-order-generative-music/actions/workflows/python-app.yml)
 # high-order-generative-music
-Experiments in generative music using [high order layers](https://github.com/jloveric/high-order-layers-torch).
-Generated audio and waveforms can be seen in the tensorboard output. This is a work in progress and I don't currently have
+This is a work in progress and I don't currently have
 any good results.
+
+Experiments in generative music using [high order layers](https://github.com/jloveric/high-order-layers-torch).
+Generated audio and waveforms can be seen in the tensorboard output.
 
 [Free music archive](https://freemusicarchive.org/) tool is located [here](https://github.com/mdeff/fma) and the 
 
@@ -34,11 +36,10 @@ and for debugging
 ```
 python examples/memorize.py data.max_size=10000 data.window_size=1000
 ```
-run mlflow
+and
 ```
-poetry run mlflow ui
+python examples/memorize.py net=tail_focus_small data.max_size=10000 data.window_size=1000
 ```
-
 # Relevant Papers
 [Goodbye Wavenet](https://syncedreview.com/2022/06/22/a-wavenet-rival-stanford-u-study-models-raw-audio-waveforms-over-contexts-of-500k-samples/)
 

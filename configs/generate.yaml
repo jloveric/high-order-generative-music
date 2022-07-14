@@ -2,3 +2,4 @@ checkpoint:
 start: null
 samples: 1000
 frequency: 11025
+filepath: sample.mp3

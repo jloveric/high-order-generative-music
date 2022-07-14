@@ -3,17 +3,9 @@ import hydra
 from hydra import utils
 from omegaconf import DictConfig, OmegaConf
 from high_order_generative_music.plotting import plot_waveform, plot_specgram
-from high_order_generative_music.data import SingleRecordingDataModule
-from pytorch_lightning.callbacks import LearningRateMonitor
-from pytorch_lightning import Trainer
 from high_order_generative_music.networks import Net
-from high_order_generative_music.utils import (
-    AudioGenerationSampler,
-    WaveformImageSampler,
-)
-from high_order_generative_music.logger import MultiLogger
 from high_order_generative_music.utils import extend_audio
-
+import torchaudio
 import logging
 import os
 
@@ -28,9 +20,7 @@ def generate(cfg: DictConfig):
         raise ValueError(f"Must define cfg.checkpoint, got {cfg.checkpoint}")
 
     base_dir = utils.get_original_cwd()
-
-    mlflow_runs = f"file://{base_dir}/mlruns"
-    mlflow.set_tracking_uri(mlflow_runs)
+    filepath = f"{base_dir}/{cfg.filepath}"
 
     logger.info(OmegaConf.to_yaml(cfg))
     logger.info(f"Working directory {os.getcwd()}")
@@ -44,12 +34,15 @@ def generate(cfg: DictConfig):
 
     logger.info(f"checkpoint_path {checkpoint_path}")
     model = Net.load_from_checkpoint(checkpoint_path)
-    print("model.features", model._features)
+    logger.info(OmegaConf.to_yaml(model.cfg))
+    print("model.features", model.cfg.net.features)
 
     model.eval()
-    new_audio = extend_audio(model=model, features=model._features, sample=sample)
+    new_audio = extend_audio(model=model, features=model.cfg.net.features, sample=None)
 
-    image_dir = f"{hydra.utils.get_original_cwd()}/{cfg.images[0]}"
+    torchaudio.save(
+        filepath=filepath, src=new_audio.unsqueeze(0), sample_rate=cfg.frequency
+    )
 
 
 if __name__ == "__main__":

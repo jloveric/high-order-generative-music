@@ -17,8 +17,8 @@ logger = logging.getLogger(__name__)
 def extend_audio(
     model: nn.Module,
     features: int,
-    sample: torch.Tensor,
-    output_size: int,
+    sample: torch.Tensor = None,
+    output_size: int = 10000,
     noiseless: bool = True,
 ):
     """
@@ -31,10 +31,14 @@ def extend_audio(
         a flat tensor representing the audio signal
     """
 
+    if sample is None:
+        values = torch.rand(1, 1, features, device=model.device) * 2 - 1
+    else:
+        values = sample.unsqueeze(0).unsqueeze(0)
+
     model.eval()
     with torch.no_grad():
         features = features
-        values = sample.unsqueeze(0).unsqueeze(0)
 
         for i in range(output_size):
             output = model(values[:, :, -features:])
