@@ -12,6 +12,7 @@ from high_order_generative_music.utils import (
     WaveformImageSampler,
 )
 from high_order_generative_music.logger import MultiLogger
+from high_order_generative_music.utils import extend_audio
 
 import logging
 import os
@@ -34,58 +35,46 @@ def memorize(cfg: DictConfig):
 
     root_dir = hydra.utils.get_original_cwd()
 
-    if cfg.train is True:
-        full_path = f"{root_dir}/{cfg.filename}"
-        datamodule = SingleRecordingDataModule(
-            filename=full_path,
-            batch_size=cfg.batch_size,
-            window_size=cfg.data.window_size,
-            output_window_size=cfg.data.output_window_size,
-            max_size=cfg.data.max_size,
-        )
+    full_path = f"{root_dir}/{cfg.filename}"
+    datamodule = SingleRecordingDataModule(
+        filename=full_path,
+        batch_size=cfg.batch_size,
+        window_size=cfg.data.window_size,
+        output_window_size=cfg.data.output_window_size,
+        max_size=cfg.data.max_size,
+    )
 
-        audio_generator = AudioGenerationSampler(
-            features=cfg.data.window_size,
-            samples=2,
-            output_size=cfg.data.window_size,
-            sample_rate=datamodule.sample_rate,
-        )
-        waveform_generator = WaveformImageSampler(
-            features=cfg.data.window_size,
-            samples=2,
-            output_size=cfg.data.window_size,
-            sample_rate=datamodule.sample_rate,
-        )
+    audio_generator = AudioGenerationSampler(
+        features=cfg.data.window_size,
+        samples=2,
+        output_size=cfg.sample.audio_size,
+        sample_rate=datamodule.sample_rate,
+    )
+    waveform_generator = WaveformImageSampler(
+        features=cfg.data.window_size,
+        samples=2,
+        output_size=cfg.sample.waveform_size,
+        sample_rate=datamodule.sample_rate,
+    )
 
-        # Logging for both tensorboard and mlflow
-        multilogger = MultiLogger(mlflow_path=mlflow_runs)
+    # Logging for both tensorboard and mlflow
+    multilogger = MultiLogger(mlflow_path=mlflow_runs)
 
-        lr_monitor = LearningRateMonitor(logging_interval="epoch")
-        trainer = Trainer(
-            max_epochs=cfg.max_epochs,
-            gpus=cfg.gpus,
-            logger=multilogger,
-            callbacks=[lr_monitor, audio_generator, waveform_generator],
-        )
+    lr_monitor = LearningRateMonitor(logging_interval="epoch")
+    trainer = Trainer(
+        max_epochs=cfg.max_epochs,
+        gpus=cfg.gpus,
+        logger=multilogger,
+        callbacks=[lr_monitor, audio_generator, waveform_generator],
+    )
 
-        model = Net(cfg)
-        trainer.fit(model, datamodule=datamodule)
-        logger.info("testing")
+    model = Net(cfg)
+    trainer.fit(model, datamodule=datamodule)
+    logger.info("testing")
 
-        trainer.test(model, datamodule=datamodule)
-        logger.info("finished testing")
-        logger.info(f"best check_point {trainer.checkpoint_callback.best_model_path}")
-    else:
-        # plot some data
-        logger.info("evaluating result")
-        logger.info(f"cfg.checkpoint {cfg.checkpoint}")
-        checkpoint_path = f"{root_dir}/{cfg.checkpoint}"
-
-        logger.info(f"checkpoint_path {checkpoint_path}")
-        model = Net.load_from_checkpoint(checkpoint_path)
-
-        model.eval()
-        image_dir = f"{hydra.utils.get_original_cwd()}/{cfg.images[0]}"
+    trainer.test(model, datamodule=datamodule)
+    logger.info("finished testing")
+    logger.info(f"best check_point {trainer.checkpoint_callback.best_model_path}")
 
 
 if __name__ == "__main__":

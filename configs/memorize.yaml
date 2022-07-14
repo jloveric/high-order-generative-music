@@ -5,13 +5,16 @@ data:
   output_window_size: 1
   max_size: null # Set the maimum number of records to use, null means use all.
 
+sample:
+  waveform_size: ${data.window_size}
+  audio_size: ${data.window_size}
+
 max_epochs: 50
 gpus: 1
 lr: 1e-3
 batch_size: 256
 
 # Are you training? Otherwise plot the result
-train: True
 checkpoint: null
 
 defaults:

@@ -14,6 +14,36 @@ from torchvision import transforms
 logger = logging.getLogger(__name__)
 
 
+def extend_audio(
+    model: nn.Module,
+    features: int,
+    sample: torch.Tensor,
+    output_size: int,
+    noiseless: bool = True,
+):
+    """
+    Generate audio from a given sample
+    Args :
+        features : Number of features used by the network
+        sample : Tensor of size features
+        output_size :  additional length to generate
+    Returns :
+        a flat tensor representing the audio signal
+    """
+
+    model.eval()
+    with torch.no_grad():
+        features = features
+        values = sample.unsqueeze(0).unsqueeze(0)
+
+        for i in range(output_size):
+            output = model(values[:, :, -features:])
+            output = output.unsqueeze(1)
+            values = torch.cat([values, output], dim=2)
+
+        return values.flatten()
+
+
 def generate_audio(
     model: nn.Module,
     features: int,
