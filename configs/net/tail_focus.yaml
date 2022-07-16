@@ -11,10 +11,10 @@ model_type: high_order_tail_focus
 
 n: 2
 periodicity: 2.0
-kernel_size: [10, 10, 10, 10, 10]
-stride: [10, 10, 10, 10, 10]
-channels: [1, 32, 32, 32, 32]
-segments: 4 #[2, 20, 20, 20, 20]
+kernel_size: [100, 100, 10]
+stride: [10, 10, 10]
+channels: [1, 64, 64, 64]
+segments: 2 #[2, 20, 20, 20, 20]
 
 # Focus [0,16] 16 would take 16*channels
-focus: [128, 64, 32, 16] # focus takes all of the final output
+focus: [128, 64, 32] # focus takes all of the final output
